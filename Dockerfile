@@ -1,12 +1,6 @@
-FROM python:3.7
-
+FROM python:3
 ENV PYTHONUNBUFFERED=1
-ENV DEBUG=True
-WORKDIR /usr/src/app 
-COPY requirements.txt .
-
-#RUN pip install virtualenvwrapper
-#RUN python3 -m venv /venv
-#RUN /venv/bin/pip install -U pip
-#RUN /venv/bin/pip install --upgrade  pip
+WORKDIR /usr/src/app
+COPY requirements.txt ./
+RUN pip uninstall django
 RUN pip install -r requirements.txt
