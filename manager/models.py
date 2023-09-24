@@ -28,7 +28,7 @@ class Company(models.Model):
         related_name='manager_company',
         blank=True,
     )
-    enmployees = models.ManyToManyField(
+    employees = models.ManyToManyField(
         MyUser,
         limit_choices_to={
             'position': UserPosition.Engineer.value,
@@ -38,10 +38,12 @@ class Company(models.Model):
         blank=True,
     )
     
-
     class Meta():
         verbose_name = 'Company'
         verbose_name_plural = 'Companies'
+
+    def __str__(self) -> str:
+        return (self.name).strip()
 
 
 """class Manager(models.Model):

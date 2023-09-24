@@ -22,19 +22,19 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         null=True,
         blank=True)
     first_name = models.CharField(
-        _('First Name'),
+        _('first name'),
         max_length=30,
         null=True,
         blank=True
     )
     last_name = models.CharField(
-        _('Last Name'),
+        _('last name'),
         max_length=30,
         null=True,
         blank=True
     )
     email = models.EmailField(
-        _('Email Address'),
+        _('email address'),
         unique=True,
         error_messages={
             'unique': _('User with that email already exists.')
@@ -43,7 +43,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         blank=True
     )
     position = models.CharField(
-        _("Employee Position"),
+        _("employee position"),
         max_length=150,
         choices=[
             ('Engineer', _('Engineer')),
@@ -63,5 +63,15 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     class Meta():
         verbose_name = _('user')
         verbose_name_plural = _('users')
+
+    def __str__(self) -> str:
+        return "%s %s (%s)" % (self.first_name, self.last_name, self.email)
+
+    @property
+    def full_name(self):
+        """Returns user's full name"""
+        full_name = '%s %s' % (self.first_name, self.last_name)
+        return full_name.strip()
+
 
 User = MyUser()
