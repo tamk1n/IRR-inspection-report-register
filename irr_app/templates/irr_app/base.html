@@ -24,9 +24,11 @@
                   <li class="nav-item">
                     <a class="nav-link" href="#">ÜYV Reysteri</a>
                   </li>
+                  {% if not user.is_authenticated %}
                   <li class="nav-item">
-                    <a class="nav-link" href="{% url 'user-login' %}">Giriş edin.</a>
+                    <a class="nav-link" href="{% url 'irr_app:user-login' %}">Giriş edin</a>
                   </li>
+                  {% endif %}
                 </ul>
               </div>
             </div>

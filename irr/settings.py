@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+from django.urls import reverse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -56,6 +57,7 @@ MIDDLEWARE = [
     'django.middleware.locale.LocaleMiddleware',
 ]
 
+CSRF_TRUSTED_ORIGINS = ['https://localhost:8000']
 ROOT_URLCONF = 'irr.urls'
 
 TEMPLATES = [
@@ -76,6 +78,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'irr.wsgi.application'
 
+LOGIN_REDIRECT_URL = 'irr_app:home-page'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
