@@ -1,0 +1,9 @@
+{% extends "irr_app/base.html" %}
+{% block title %}New{% endblock %}
+{% block body %}
+    <h1>Yeni Yoxlama Hesabatı</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{form.as_p}}
+    </form>
+{% endblock %} 

@@ -3,6 +3,7 @@ from django.views import generic
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.forms import AuthenticationForm
 from django.urls import reverse
+from .forms import NewIRForm
 
 
 class HomePageView(generic.TemplateView):
@@ -15,8 +16,10 @@ class UserLoginView(LoginView):
     form_class = AuthenticationForm
 
 
-class NewIRView(generic.TemplateView):
-    pass
+class NewIRView(generic.FormView):
+    template_name = "irr_app/newir.html"
+    form_class = NewIRForm
+
     
     
 

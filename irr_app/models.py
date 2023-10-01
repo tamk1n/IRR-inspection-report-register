@@ -1,12 +1,13 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from base_user.models import MyUser
+from manager.models import Company
 from base_user.utils import UserPosition
 
 # Create your models here.
 
 class InspectionReport(models.Model):
-    date = models.DateTimeField()
+    date = models.DateField()
     engineer = models.ManyToManyField(
         MyUser,
         verbose_name= _('Engineer'),
@@ -27,13 +28,22 @@ class InspectionReport(models.Model):
         null=True, 
         blank=True
     )
+    company = models.ForeignKey(
+        Company,
+        verbose_name=_('Company Name'),
+        related_name='irs',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
     
-    division = models.ManyToManyField(
-        'irr_app.Divisions',
+    division = models.ForeignKey(
+        'irr_app.Division',
         verbose_name=_('Division'),
         related_name='division_irs',
         null=True,
-        blank=True
+        blank=True,
+        on_delete=models.CASCADE
     )
 
     field = models.CharField(
@@ -51,7 +61,7 @@ class InspectionReport(models.Model):
     )
 
     observations = models.ManyToManyField(
-        'irr_app.Observations',
+        'irr_app.Observation',
         related_name='ir',
         null=True,
         blank=True
@@ -66,7 +76,7 @@ class InspectionReport(models.Model):
         blank=True
     )
 
-class Divisions(models.Model):
+class Division(models.Model):
     name = models.CharField(
         _("Division Name"),
         max_length=50,
@@ -75,5 +85,5 @@ class Divisions(models.Model):
     )
 
 
-class Observations(models.Model):
+class Observation(models.Model):
     content = models.TextField(null=True, blank=True)
