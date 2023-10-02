@@ -84,6 +84,9 @@ class Division(models.Model):
         blank=True
     )
 
+    def __str__(self) -> str:
+        return "%s" % (self.name)
+
 
 class Observation(models.Model):
     content = models.TextField(null=True, blank=True)
