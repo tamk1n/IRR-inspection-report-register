@@ -12,7 +12,7 @@ class NewIRForm(forms.Form):
     project = forms.CharField(label=_("Project"))
 
     division = forms.ModelChoiceField(
-        label=_("Project"),
+        label=_("Division"),
         queryset = Division.objects.all())
 
     field = forms.CharField(label=_("Field"))
@@ -28,7 +28,7 @@ class NewIRForm(forms.Form):
         label=_("Observation 2"),
         widget=forms.Textarea)
 
-    type_of_observation = forms.ChoiceField(choices=[
+    ir_type = forms.ChoiceField(choices=[
             ('NGT', _('Negative')),
             ('POS', _('Positive'))
         ])

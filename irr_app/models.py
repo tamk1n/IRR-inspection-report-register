@@ -67,7 +67,7 @@ class InspectionReport(models.Model):
         blank=True
     )
     
-    observation_type = models.CharField(
+    ir_type = models.CharField(
         choices=[
             ('NGT', _('Negative')),
             ('POS', _('Positive'))
@@ -76,14 +76,23 @@ class InspectionReport(models.Model):
         blank=True
     )
 
+
 class Division(models.Model):
     name = models.CharField(
         _("Division Name"),
         max_length=50,
         null=True,
-        blank=True
+        blank=True,
     )
 
+    company = models.ForeignKey(
+        Company,
+        verbose_name=_("Division Company"),
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='company_dvs'
+    )
     def __str__(self) -> str:
         return "%s" % (self.name)
 

@@ -31,16 +31,25 @@ class NewIRView(generic.FormView):
         responsible_person = form.cleaned_data['responsible_person']
         observation1 = form.cleaned_data['observation1']
         observation2 = form.cleaned_data['observation2']
-        type_of_observation = form.cleaned_data['type_of_observation']
+        ir_type = form.cleaned_data['ir_type']
+        company = self.request.user.employee_company.first()
 
-        Observation.objects.create(content=observation1)
-        Observation.objects.create(content=observation2)
+        observation1 = Observation.objects.create(content=observation1)
+        observation2 = Observation.objects.create(content=observation2)
         #print(self.request.user.username)
-        InspectionReport.objects.create(date=date,
-                                        engineer=self.request.user,
+        new_report = InspectionReport.objects.create(date=date,
+                                        #engineer=self.request.user,
                                         project=project,
-                                        company=self.request.user.employee_company,
+                                        company=company,
+                                        division=company.company_dvs.filter(name=division).first(),
+                                        field=field,
+                                        responsible_person=responsible_person,
+                                        #observation1=observation1,
+                                        #observation2=observation2,
+                                        ir_type=ir_type
                                         )
+        new_report.engineer.add(self.request.user)
+        new_report.observations.add(observation1, observation2)
         return super().form_valid(form)
 
 class DoneView(generic.TemplateView):
