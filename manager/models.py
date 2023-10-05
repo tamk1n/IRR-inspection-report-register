@@ -5,7 +5,6 @@ from base_user.utils import UserPosition
 
 # Create your models here.
 
-
 class Company(models.Model):
     name = models.CharField(
         _('Company name'),

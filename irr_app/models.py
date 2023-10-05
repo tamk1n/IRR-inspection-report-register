@@ -76,6 +76,8 @@ class InspectionReport(models.Model):
         blank=True
     )
 
+    def __str__(self) -> str:
+        return "ÜYV %i" % (self.id)
 
 class Division(models.Model):
     name = models.CharField(

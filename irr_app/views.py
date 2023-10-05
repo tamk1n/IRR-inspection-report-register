@@ -1,11 +1,14 @@
+from typing import Any
+from django.db.models.query import QuerySet
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import generic
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.forms import AuthenticationForm
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from .forms import NewIRForm
 from .models import InspectionReport, Division, Observation
+from manager.models import Company
 
 
 class HomePageView(generic.TemplateView):
@@ -21,7 +24,7 @@ class UserLoginView(LoginView):
 class NewIRView(generic.FormView):
     template_name = "irr_app/newir.html"
     form_class = NewIRForm
-    success_url = reverse_lazy('irr_app:done')
+    success_url = reverse_lazy('irr_app:register')
 
     def form_valid(self, form: NewIRForm) -> HttpResponse:
         date = form.cleaned_data['date']
@@ -36,24 +39,33 @@ class NewIRView(generic.FormView):
 
         observation1 = Observation.objects.create(content=observation1)
         observation2 = Observation.objects.create(content=observation2)
-        #print(self.request.user.username)
         new_report = InspectionReport.objects.create(date=date,
-                                        #engineer=self.request.user,
                                         project=project,
                                         company=company,
                                         division=company.company_dvs.filter(name=division).first(),
                                         field=field,
                                         responsible_person=responsible_person,
-                                        #observation1=observation1,
-                                        #observation2=observation2,
                                         ir_type=ir_type
                                         )
+        
         new_report.engineer.add(self.request.user)
         new_report.observations.add(observation1, observation2)
         return super().form_valid(form)
 
-class DoneView(generic.TemplateView):
+class IRRegisterView(generic.ListView):
+    model = InspectionReport
     template_name='irr_app/done.html'
     
+    def get_queryset(self) -> QuerySet[Any]:
+        user = self.request.user
+        company = user.employee_company.first()
+        queryset = InspectionReport.objects.filter(company=company).all()
+        print(queryset)
+
+        return queryset
     
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        print(context)
+        return context
 
