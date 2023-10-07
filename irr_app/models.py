@@ -66,7 +66,7 @@ class InspectionReport(models.Model):
         null=True,
         blank=True
     )
-    
+
     ir_type = models.CharField(
         choices=[
             ('NGT', _('Negative')),
@@ -78,6 +78,15 @@ class InspectionReport(models.Model):
 
     def __str__(self) -> str:
         return "ÜYV %i" % (self.id)
+    
+    @property
+    def observation_count(self):
+        return self.observations.count()
+    
+    @property
+    def observation_count(self):
+        return self.observations.count() 
+    
 
 class Division(models.Model):
     name = models.CharField(

@@ -55,17 +55,16 @@ class NewIRView(generic.FormView):
 class IRRegisterView(generic.ListView):
     model = InspectionReport
     template_name='irr_app/done.html'
-    
+
     def get_queryset(self) -> QuerySet[Any]:
         user = self.request.user
         company = user.employee_company.first()
         queryset = InspectionReport.objects.filter(company=company).all()
-        print(queryset)
-
         return queryset
     
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        context = {**context, 'engineer':context['object_list'].first().engineer.first().full_name}
         print(context)
         return context
 

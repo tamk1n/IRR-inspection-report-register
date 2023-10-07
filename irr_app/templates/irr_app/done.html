@@ -4,19 +4,32 @@
 <table class="table table-hover">
     <thead>
       <tr>
-        <th scope="col">Type</th>
-        <th scope="col">Column heading</th>
-        <th scope="col">Column heading</th>
-        <th scope="col">Column heading</th>
+        <th scope="col">Yoxlama Tarixi</th>
+        <th scope="col">№</th>
+        <th scope="col">Aşkarlayan</th>
+        <th scope="col">Obyekt</th>
+        <th scope="col">Bölüm</th>
+        <th scope="col">Sahə</th>
+        <th scope="col">Cavabdeh Şəxs</th>
+        <th scope="col">Müşahidə sayı</th>
+        <th scope="col">Müşahidələr</th>
+        <th scope="col">Müşahidə növü</th>
       </tr>
     </thead>
     <tbody>
+      {% for ir in object_list %}
       <tr class="table-dark">
-        <th scope="row">Dark</th>
-        <td>Column content</td>
-        <td>Column content</td>
-        <td>Column content</td>
+        <th scope="row">{{ir.date|date:"d.m.Y"|lower}}</th>
+        <td>{{ir.id}}</td>
+        <td>{{engineer}}</td>
+        <td>{{ir.project}}</td>
+        <td>{{ir.division}}</td>
+        <td>{{ir.field}}</td>
+        <td>{{ir.responsible_person}}</td>
+        <td>{{ir.observation_count}}</td>
+        <td>{{ir.observations}}</td>
       </tr>
+      {% endfor %}
     </tbody>
   </table>
 {% endblock %}
