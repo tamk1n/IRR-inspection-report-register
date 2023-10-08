@@ -79,6 +79,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'irr.wsgi.application'
 
 LOGIN_REDIRECT_URL = 'irr_app:home-page'
+LOGOUT_REDIRECT_URL = 'irr_app:home-page'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases

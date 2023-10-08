@@ -22,20 +22,20 @@ class InspectionReport(models.Model):
     )
 
     project = models.CharField(
-        _('Porject Name'),
+        _('Project Name'),
         help_text='Project Name',
         max_length=1000,
         null=True, 
         blank=True
     )
-    company = models.ForeignKey(
+    """company = models.ForeignKey(
         Company,
         verbose_name=_('Company Name'),
         related_name='irs',
         on_delete=models.CASCADE,
         null=True,
         blank=True
-    )
+    )"""
     
     division = models.ForeignKey(
         'irr_app.Division',
@@ -69,8 +69,8 @@ class InspectionReport(models.Model):
 
     ir_type = models.CharField(
         choices=[
-            ('NGT', _('Negative')),
-            ('POS', _('Positive'))
+            ('Negative', _('Negative')),
+            ('Positive', _('Positive'))
         ],
         null=True,
         blank=True
@@ -82,10 +82,6 @@ class InspectionReport(models.Model):
     @property
     def observation_count(self):
         return self.observations.count()
-    
-    @property
-    def observation_count(self):
-        return self.observations.count() 
     
 
 class Division(models.Model):
@@ -110,3 +106,7 @@ class Division(models.Model):
 
 class Observation(models.Model):
     content = models.TextField(null=True, blank=True)
+
+    def __str__(self) -> str:
+        return "Observation %s" % (self.id,)
+    

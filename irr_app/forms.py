@@ -1,5 +1,7 @@
+from collections.abc import Mapping
 from typing import Any
 from django import forms
+from django.forms.utils import ErrorList
 from django.utils.translation import gettext_lazy as _
 from .models import Division
 
@@ -10,10 +12,14 @@ class NewIRForm(forms.Form):
         widget=forms.SelectDateWidget())
   
     project = forms.CharField(label=_("Project"))
+    division = forms.ModelChoiceField(label=_("Division"), queryset=None)
 
-    division = forms.ModelChoiceField(
-        label=_("Division"),
-        queryset = Division.objects.all())
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user')
+        super().__init__(*args, **kwargs)
+
+        if user:
+            self.fields['division'].queryset = user.employee_company.first().company_dvs
 
     field = forms.CharField(label=_("Field"))
 

@@ -21,13 +21,24 @@
       <tr class="table-dark">
         <th scope="row">{{ir.date|date:"d.m.Y"|lower}}</th>
         <td>{{ir.id}}</td>
-        <td>{{engineer}}</td>
+        <td>
+          {% for engineer in ir.engineer.all %}
+            {{ engineer.full_name }}
+          {% endfor %}
+        </td>        
         <td>{{ir.project}}</td>
         <td>{{ir.division}}</td>
         <td>{{ir.field}}</td>
         <td>{{ir.responsible_person}}</td>
+        <td>
+          <ol>
+          {% for observation in ir.observations.all %}
+              <li>{{ observation.content }}</li>
+          {% endfor %}
+          </ol>
+        </td>
         <td>{{ir.observation_count}}</td>
-        <td>{{ir.observations}}</td>
+        <td>{{ir.ir_type}}</td>
       </tr>
       {% endfor %}
     </tbody>
