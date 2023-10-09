@@ -5,6 +5,8 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import generic
 from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from django.contrib.auth.forms import AuthenticationForm
 from django.urls import reverse_lazy, reverse
 from .forms import NewIRForm
@@ -13,11 +15,13 @@ from manager.models import Company
 from django.template import loader
 
 
+#@method_decorator(login_required, name="dispatch")
 class HomePageView(generic.TemplateView):
     """Just Home Page View"""
     template_name = "irr_app/home_page.html"
 
 
+@method_decorator(login_required, name="dispatch")
 class UserLoginView(LoginView):
     """Logs in user"""
     template_name = "irr_app/login.html"
@@ -27,14 +31,8 @@ class UserLoginView(LoginView):
 
 class UserLogoutView(LogoutView):
     http_method_names = ['post']
-    template_name = "irr_app/logout.html"
 
-    def http_method_not_allowed(self, request, *args: Any, **kwargs: Any) -> HttpResponse:
-        template = loader.get_template("irr_app/logout.html")
-        context = {}
-        return HttpResponse(template.render(context, request))
-
-
+@method_decorator(login_required, name="dispatch")
 class NewIRView(generic.FormView):
     """Creates new Inspection Report Form"""
     template_name = "irr_app/newir.html"
@@ -74,6 +72,8 @@ class NewIRView(generic.FormView):
         new_report.observations.add(observation1, observation2)
         return super().form_valid(form)
 
+
+@method_decorator(login_required, name="dispatch")
 class IRRegisterView(generic.ListView):
     model = InspectionReport
     template_name='irr_app/done.html'

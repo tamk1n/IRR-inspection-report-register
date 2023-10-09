@@ -55,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'irr_app.custom_middleware.Handle405Middleware',
 ]
 
 CSRF_TRUSTED_ORIGINS = ['https://localhost:8000']
