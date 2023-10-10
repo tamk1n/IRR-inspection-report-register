@@ -79,6 +79,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'irr.wsgi.application'
 
+LOGIN_URL = 'irr_app:user-login'
 LOGIN_REDIRECT_URL = 'irr_app:home-page'
 LOGOUT_REDIRECT_URL = 'irr_app:home-page'
 

@@ -1,27 +1,22 @@
 from typing import Any
-from django import http
 from django.db.models.query import QuerySet
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.core.paginator import Paginator
 from django.views import generic
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.forms import AuthenticationForm
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse_lazy
 from .forms import NewIRForm
-from .models import InspectionReport, Division, Observation
-from manager.models import Company
-from django.template import loader
+from .models import InspectionReport, Observation
 
 
-#@method_decorator(login_required, name="dispatch")
 class HomePageView(generic.TemplateView):
     """Just Home Page View"""
     template_name = "irr_app/home_page.html"
 
 
-@method_decorator(login_required, name="dispatch")
 class UserLoginView(LoginView):
     """Logs in user"""
     template_name = "irr_app/login.html"
@@ -56,7 +51,6 @@ class NewIRView(generic.FormView):
         observation1 = form.cleaned_data['observation1']
         observation2 = form.cleaned_data['observation2']
         ir_type = form.cleaned_data['ir_type']
-        #company = self.request.user.employee_company.first()
 
         observation1 = Observation.objects.create(content=observation1)
         observation2 = Observation.objects.create(content=observation2)
@@ -76,7 +70,9 @@ class NewIRView(generic.FormView):
 @method_decorator(login_required, name="dispatch")
 class IRRegisterView(generic.ListView):
     model = InspectionReport
-    template_name='irr_app/done.html'
+    template_name = 'irr_app/done.html'
+    paginator_class = Paginator
+    paginate_by = 2
 
     def get_queryset(self) -> QuerySet[Any]:
         user = self.request.user
