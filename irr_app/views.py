@@ -31,6 +31,7 @@ class UserLogoutView(LogoutView):
 class NewIRView(generic.FormView):
     """Creates new Inspection Report Form"""
     template_name = "irr_app/newir.html"
+    
     form_class = NewIRForm
     success_url = reverse_lazy('irr_app:register')
 
@@ -72,8 +73,8 @@ class IRRegisterView(generic.ListView):
     model = InspectionReport
     template_name = 'irr_app/done.html'
     paginator_class = Paginator
-    paginate_by = 2
-
+    paginate_by = 15
+    
     def get_queryset(self) -> QuerySet[Any]:
         user = self.request.user
         company = user.employee_company.first()
@@ -84,4 +85,12 @@ class IRRegisterView(generic.ListView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         return context
+
+
+#@method_decorator(login_required, name="dispatch")
+class SingleDeleteIR(generic.DeleteView):
+    model = InspectionReport
+    http_method_names = ['post']
+    success_url = reverse_lazy('irr_app:irr')
+
 

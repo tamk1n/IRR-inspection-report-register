@@ -58,7 +58,7 @@ MIDDLEWARE = [
     'irr_app.custom_middleware.Handle405Middleware',
 ]
 
-CSRF_TRUSTED_ORIGINS = ['https://localhost:8000']
+CSRF_TRUSTED_ORIGINS = ['https://localhost:8000', 'https://silver-happiness-jj57wxpqq4r5cp44x-8000.app.github.dev']
 ROOT_URLCONF = 'irr.urls'
 
 TEMPLATES = [

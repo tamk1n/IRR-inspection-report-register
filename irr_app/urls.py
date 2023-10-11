@@ -1,7 +1,7 @@
 from django.urls import path
 from irr_app.views import (HomePageView, UserLoginView,
                            NewIRView, IRRegisterView,
-                           UserLogoutView)
+                           UserLogoutView, SingleDeleteIR)
 
 app_name = 'irr_app'
 
@@ -10,5 +10,6 @@ urlpatterns = [
     path('login', UserLoginView.as_view(), name='user-login'),
     path('logout', UserLogoutView.as_view(), name='user-logout'),
     path('new', NewIRView.as_view(), name='new-ir'),
-    path('register', IRRegisterView.as_view(), name='register'),
+    path('irr', IRRegisterView.as_view(), name='irr'),
+    path('delete/<int:pk>', SingleDeleteIR.as_view(), name='single-delete-ir'),
 ]
