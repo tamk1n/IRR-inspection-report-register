@@ -11,10 +11,10 @@
         <th scope="col">Bölüm</th>
         <th scope="col">Sahə</th>
         <th scope="col">Cavabdeh Şəxs</th>
-        <th scope="col">Müşahidə sayı</th>
         <th scope="col">Müşahidələr</th>
         <th scope="col">Müşahidə növü</th>
-        <th scope="col">Sil</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
       </tr>
     </thead>
     <tbody>
@@ -38,8 +38,13 @@
           {% endfor %}
           </ol>
         </td>
-        <td>{{ir.observation_count}}</td>
         <td>{{ir.ir_type}}</td>
+        <td>
+          <form action="{% url 'irr_app:update-ir' ir.id %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Redaktə">
+          </form>
+        </td>
         <td>
           <form action="{% url 'irr_app:single-delete-ir' ir.id %}" method="post">
             {% csrf_token %}

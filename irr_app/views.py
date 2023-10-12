@@ -8,10 +8,9 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.forms import AuthenticationForm
 from django.urls import reverse_lazy
+from django.http import HttpResponseRedirect
 from .forms import NewIRForm
 from .models import InspectionReport, Observation
-from django.contrib.auth.decorators import user_passes_test
-from .permissions import engineer_delete_ir
 
 
 
@@ -30,23 +29,23 @@ class UserLoginView(LoginView):
 class UserLogoutView(LogoutView):
     http_method_names = ['post']
 
-@method_decorator(login_required, name="dispatch")
+"""@method_decorator(login_required, name="dispatch")
 class NewIRView(generic.FormView):
-    """Creates new Inspection Report Form"""
+    Creates new Inspection Report Form
     template_name = "irr_app/newir.html"
     
     form_class = NewIRForm
     success_url = reverse_lazy('irr_app:register')
 
     def get_form_kwargs(self) -> dict[str, Any]:
-        """Adds authenticated user to keyword arguments
-           Return keyword arguments"""
+        Adds authenticated user to keyword arguments
+           Return keyword arguments
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
     
     def form_valid(self, form: NewIRForm) -> HttpResponse:
-        """Form validation"""
+        Form validation
         date = form.cleaned_data['date']
         project = form.cleaned_data['project']
         division = form.cleaned_data['division']
@@ -68,8 +67,22 @@ class NewIRView(generic.FormView):
         
         new_report.engineer.add(self.request.user)
         new_report.observations.add(observation1, observation2)
-        return super().form_valid(form)
+        return super().form_valid(form)"""
 
+
+class NewIRView(generic.CreateView):
+    model = InspectionReport
+    #fields = ['date', 'project', 'field', 'responsible_person', 'observations', 'ir_type']
+    template_name = 'irr_app/newir.html'
+    form_class = NewIRForm
+
+    def get_form_kwargs(self) -> dict[str, Any]:
+        #Adds authenticated user to keyword arguments
+        #Return keyword arguments
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        kwargs.pop('instance')
+        return kwargs
 
 @method_decorator(login_required, name="dispatch")
 class IRRegisterView(generic.ListView):
@@ -106,5 +119,22 @@ class SingleDeleteIR(generic.DeleteView):
         """
         self.object = self.get_object()
         success_url = self.get_success_url()
-        self.object.delete()
+
+        # checks if the authenticated user is the creator of the IR
+        if self.object in self.request.user.my_irs.all():
+            self.object.delete()
+
         return HttpResponseRedirect(success_url)
+
+
+@method_decorator(login_required, name="dispatch")
+class UpdateIRView(generic.UpdateView):
+    model = InspectionReport
+    template_name = 'irr_app/newir.html'
+    form_class = NewIRForm
+    #fields = ['date', 'project', 'field', 'responsible_person', 'observations', 'ir_type']
+
+    def get_form_kwargs(self) -> dict[str, Any]:
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
