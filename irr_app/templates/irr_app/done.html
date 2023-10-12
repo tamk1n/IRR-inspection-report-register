@@ -42,8 +42,8 @@
         <td>{{ir.ir_type}}</td>
         <td>
           <form action="{% url 'irr_app:single-delete-ir' ir.id %}" method="post">
-          {% csrf_token %}
-          <input type="submit" value="Sil">
+            {% csrf_token %}
+            <input type="submit" value="Sil">
           </form>
         </td>
       </tr>

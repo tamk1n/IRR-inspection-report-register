@@ -10,6 +10,9 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.urls import reverse_lazy
 from .forms import NewIRForm
 from .models import InspectionReport, Observation
+from django.contrib.auth.decorators import user_passes_test
+from irr_app.permissions import check_user_ir
+
 
 
 class HomePageView(generic.TemplateView):
@@ -86,11 +89,11 @@ class IRRegisterView(generic.ListView):
         context = super().get_context_data(**kwargs)
         return context
 
-
-#@method_decorator(login_required, name="dispatch")
+@user_passes_test(check_user_ir, name='post')
+@method_decorator(login_required, name="dispatch")
 class SingleDeleteIR(generic.DeleteView):
     model = InspectionReport
-    http_method_names = ['post']
+    http_method_names = ['delete']
     success_url = reverse_lazy('irr_app:irr')
 
 
