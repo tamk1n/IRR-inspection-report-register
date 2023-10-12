@@ -11,7 +11,7 @@ from django.urls import reverse_lazy
 from .forms import NewIRForm
 from .models import InspectionReport, Observation
 from django.contrib.auth.decorators import user_passes_test
-from irr_app.permissions import check_user_ir
+from .permissions import engineer_delete_ir
 
 
 
@@ -89,11 +89,22 @@ class IRRegisterView(generic.ListView):
         context = super().get_context_data(**kwargs)
         return context
 
-@user_passes_test(check_user_ir, name='post')
+
 @method_decorator(login_required, name="dispatch")
 class SingleDeleteIR(generic.DeleteView):
     model = InspectionReport
-    http_method_names = ['delete']
+    http_method_names = ['post']
     success_url = reverse_lazy('irr_app:irr')
 
+    def post(self, request, *args, **kwargs):
+        return self.delete(request, *args, **kwargs)
 
+    def delete(self, request, *args, **kwargs):
+        """
+        Call the delete() method on the fetched object and then redirect to the
+        success URL.
+        """
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        self.object.delete()
+        return HttpResponseRedirect(success_url)
