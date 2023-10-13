@@ -71,19 +71,24 @@ class NewIRView(generic.FormView):
 
 
 class NewIRView(generic.CreateView):
-    model = InspectionReport
+    #model = InspectionReport
     #fields = ['date', 'project', 'field', 'responsible_person', 'observations', 'ir_type']
     template_name = 'irr_app/newir.html'
     form_class = NewIRForm
-
+    success_url = reverse_lazy('irr_app:irr')
+    
     def get_form_kwargs(self) -> dict[str, Any]:
-        #Adds authenticated user to keyword arguments
-        #Return keyword arguments
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         kwargs.pop('instance')
         return kwargs
 
+    def form_valid(self, form):
+        """If the form is valid, save the associated model."""
+        self.object = form.save()
+        self.object.engineer.add(self.request.user)
+        return super().form_valid(form)
+    
 @method_decorator(login_required, name="dispatch")
 class IRRegisterView(generic.ListView):
     model = InspectionReport
