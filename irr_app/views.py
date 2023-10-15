@@ -1,6 +1,7 @@
 from typing import Any
 from django.db.models.query import QuerySet
-from django.http import HttpResponse
+from django.forms.models import BaseModelForm
+from django.http import HttpRequest, HttpResponse
 from django.core.paginator import Paginator
 from django.views import generic
 from django.contrib.auth.views import LoginView, LogoutView
@@ -11,7 +12,6 @@ from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect
 from .forms import NewIRForm
 from .models import InspectionReport, Observation
-
 
 
 class HomePageView(generic.TemplateView):
@@ -27,68 +27,45 @@ class UserLoginView(LoginView):
 
 
 class UserLogoutView(LogoutView):
+    """Logs user out and
+    Redirect user to login page
+    Customize LOGOUT_REDIRECT_URL in settings.py
+    Only accepts POST request. 
+    Any other request handled by Handle405Middleware"""
     http_method_names = ['post']
 
-"""@method_decorator(login_required, name="dispatch")
-class NewIRView(generic.FormView):
-    Creates new Inspection Report Form
-    template_name = "irr_app/newir.html"
-    
-    form_class = NewIRForm
-    success_url = reverse_lazy('irr_app:register')
 
-    def get_form_kwargs(self) -> dict[str, Any]:
-        Adds authenticated user to keyword arguments
-           Return keyword arguments
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs
-    
-    def form_valid(self, form: NewIRForm) -> HttpResponse:
-        Form validation
-        date = form.cleaned_data['date']
-        project = form.cleaned_data['project']
-        division = form.cleaned_data['division']
-        field = form.cleaned_data['field']
-        responsible_person = form.cleaned_data['responsible_person']
-        observation1 = form.cleaned_data['observation1']
-        observation2 = form.cleaned_data['observation2']
-        ir_type = form.cleaned_data['ir_type']
-
-        observation1 = Observation.objects.create(content=observation1)
-        observation2 = Observation.objects.create(content=observation2)
-        new_report = InspectionReport.objects.create(date=date,
-                                        project=project,
-                                        division=self.request.user.employee_company.first().company_dvs.filter(name=division).first(),
-                                        field=field,
-                                        responsible_person=responsible_person,
-                                        ir_type=ir_type
-                                        )
-        
-        new_report.engineer.add(self.request.user)
-        new_report.observations.add(observation1, observation2)
-        return super().form_valid(form)"""
-
-
+@method_decorator(login_required, name='dispatch')
 class NewIRView(generic.CreateView):
-    #model = InspectionReport
-    #fields = ['date', 'project', 'field', 'responsible_person', 'observations', 'ir_type']
+    """Creates new IR
+    Redirect user to IR Register after successfully create IR"""
     template_name = 'irr_app/newir.html'
     form_class = NewIRForm
     success_url = reverse_lazy('irr_app:irr')
     
     def get_form_kwargs(self) -> dict[str, Any]:
+        """Add authenticated user to keyword arguments
+        It will be used in forms"""
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
-        kwargs.pop('instance')
         return kwargs
 
     def form_valid(self, form):
         """If the form is valid, save the associated model."""
         self.object = form.save()
+
+        # create new observations since 
+        # Observation and InspectionReport are many-to-many related
+        obs1 = Observation.objects.create(content=form.cleaned_data['observation1'])
+        obs2 = Observation.objects.create(content=form.cleaned_data['observation2'])
+
+        # add the engineer who raised IR to InspectionReport
+        # since MyUser and Inspection Report are many-to-one related
         self.object.engineer.add(self.request.user)
+        self.object.observations.add(obs1, obs2)
         return super().form_valid(form)
     
+
 @method_decorator(login_required, name="dispatch")
 class IRRegisterView(generic.ListView):
     model = InspectionReport
@@ -97,6 +74,7 @@ class IRRegisterView(generic.ListView):
     paginate_by = 15
     
     def get_queryset(self) -> QuerySet[Any]:
+        """queryset for specific division which is part of user's company"""
         user = self.request.user
         company = user.employee_company.first()
         divisions = company.company_dvs.all()
@@ -105,11 +83,16 @@ class IRRegisterView(generic.ListView):
     
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        context['user'] = self.request.user
+        print(context)
         return context
 
 
 @method_decorator(login_required, name="dispatch")
 class SingleDeleteIR(generic.DeleteView):
+    """Single delete of IR.
+    View only accepts POST Request
+    Any other request handled by Handle405Middleware"""
     model = InspectionReport
     http_method_names = ['post']
     success_url = reverse_lazy('irr_app:irr')
@@ -136,10 +119,38 @@ class SingleDeleteIR(generic.DeleteView):
 class UpdateIRView(generic.UpdateView):
     model = InspectionReport
     template_name = 'irr_app/newir.html'
+    success_url = reverse_lazy('irr_app:irr')
     form_class = NewIRForm
-    #fields = ['date', 'project', 'field', 'responsible_person', 'observations', 'ir_type']
+
+    def get(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        """If user is not the creator of IR it redirects user to success_url"""
+        ir = self.get_object()
+        if ir in self.request.user.my_irs.all():
+            return super().get(request, *args, **kwargs)
+        return HttpResponseRedirect(self.success_url)
 
     def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
+    
+    def get_initial(self) -> dict[str, Any]:
+        initial = super().get_initial()
+        ir = self.get_object()
+        initial = {'observation1': ir.observations.all()[0].content,
+                   'observation2': ir.observations.all()[1].content}
+        return initial
+    
+    def form_valid(self, form):
+        """If the form is valid, save the associated model."""
+        self.object = form.save()
+
+        # create new observations since 
+        # Observation and InspectionReport are many-to-many related
+        ir = self.get_object()
+        obs1, obs2 = ir.observations.all()[0], ir.observations.all()[1]
+        obs1.content, obs2.content = form.cleaned_data['observation1'], form.cleaned_data['observation2']
+        obs1.save()
+        obs2.save()
+        return super().form_valid(form)
+    

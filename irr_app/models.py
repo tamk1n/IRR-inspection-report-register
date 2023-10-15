@@ -4,7 +4,6 @@ from base_user.models import MyUser
 from manager.models import Company
 from base_user.utils import UserPosition
 
-# Create your models here.
 
 class InspectionReport(models.Model):
     date = models.DateField()
@@ -23,20 +22,11 @@ class InspectionReport(models.Model):
 
     project = models.CharField(
         _('Project Name'),
-        help_text='Project Name',
         max_length=1000,
-        null=True, 
-        blank=True
-    )
-    """company = models.ForeignKey(
-        Company,
-        verbose_name=_('Company Name'),
-        related_name='irs',
-        on_delete=models.CASCADE,
         null=True,
         blank=True
-    )"""
-    
+    )
+
     division = models.ForeignKey(
         'irr_app.Division',
         verbose_name=_('Division'),
@@ -100,6 +90,7 @@ class Division(models.Model):
         on_delete=models.CASCADE,
         related_name='company_dvs'
     )
+    
     def __str__(self) -> str:
         return "%s" % (self.name)
 
