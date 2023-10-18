@@ -6,7 +6,7 @@ from base_user.utils import UserPosition
 
 
 class InspectionReport(models.Model):
-    date = models.DateField()
+    date = models.DateField(blank=False)
     engineer = models.ManyToManyField(
         MyUser,
         verbose_name= _('Engineer'),
@@ -17,14 +17,14 @@ class InspectionReport(models.Model):
         },
         related_name='my_irs',
         null=True,
-        blank=True
+        blank=False,
     )
 
     project = models.CharField(
         _('Project Name'),
         max_length=1000,
         null=True,
-        blank=True
+        blank=False
     )
 
     division = models.ForeignKey(
@@ -32,7 +32,7 @@ class InspectionReport(models.Model):
         verbose_name=_('Division'),
         related_name='division_irs',
         null=True,
-        blank=True,
+        blank=False,
         on_delete=models.CASCADE
     )
 
@@ -40,21 +40,21 @@ class InspectionReport(models.Model):
         _('Division field'),
         max_length=50,
         null=True,
-        blank=True
+        blank=False
     )
 
     responsible_person = models.CharField(
         _('Responsible Person'),
         max_length=50,
         null=True,
-        blank=True
+        blank=False
     )
 
     observations = models.ManyToManyField(
         'irr_app.Observation',
         related_name='ir',
         null=True,
-        blank=True
+        blank=False
     )
 
     ir_type = models.CharField(
@@ -63,7 +63,7 @@ class InspectionReport(models.Model):
             ('Positive', _('Positive'))
         ],
         null=True,
-        blank=True
+        blank=False
     )
 
     def __str__(self) -> str:
@@ -96,7 +96,7 @@ class Division(models.Model):
 
 
 class Observation(models.Model):
-    content = models.TextField(null=True, blank=True)
+    content = models.TextField(null=True, blank=False)
 
     def __str__(self) -> str:
         return "Observation %s" % (self.id,)
