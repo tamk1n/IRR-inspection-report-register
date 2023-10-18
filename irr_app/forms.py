@@ -25,7 +25,7 @@ class NewIRForm(forms.ModelForm):
         model = InspectionReport
         fields = ('date', 'project',
                   'division', 'field', 'responsible_person',
-                  'ir_type')
+                  'ir_type', 'image')
     
         widgets = {
             'date': forms.SelectDateWidget(),

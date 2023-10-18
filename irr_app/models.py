@@ -66,6 +66,8 @@ class InspectionReport(models.Model):
         blank=False
     )
 
+    image = models.ImageField(null=True)
+
     def __str__(self) -> str:
         return "ÜYV %i" % (self.id)
     

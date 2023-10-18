@@ -2,7 +2,7 @@
 {% block title %}New{% endblock %}
 {% block body %}
     <h1>Yeni Yoxlama Hesabatı</h1>
-    <form method="post">
+    <form enctype="multipart/form-data" method="post">
         {% csrf_token %}
         {{form.as_p}}
         <input type="submit">

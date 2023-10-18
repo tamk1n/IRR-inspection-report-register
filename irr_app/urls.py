@@ -3,7 +3,8 @@ from irr_app.views import (HomePageView, UserLoginView,
                            NewIRView, IRRegisterView,
                            UserLogoutView, SingleDeleteIR,
                            UpdateIRView)
-
+from django.conf import settings
+from django.conf.urls.static import static
 app_name = 'irr_app'
 
 urlpatterns = [
@@ -14,4 +15,4 @@ urlpatterns = [
     path('irr', IRRegisterView.as_view(), name='irr'),
     path('delete/<int:pk>', SingleDeleteIR.as_view(), name='single-delete-ir'),
     path('update/<int:pk>', UpdateIRView.as_view(), name='update-ir'),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
