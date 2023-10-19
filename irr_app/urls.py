@@ -15,4 +15,7 @@ urlpatterns = [
     path('irr', IRRegisterView.as_view(), name='irr'),
     path('delete/<int:pk>', SingleDeleteIR.as_view(), name='single-delete-ir'),
     path('update/<int:pk>', UpdateIRView.as_view(), name='update-ir'),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,3 +1,4 @@
+from typing import Any
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from base_user.models import MyUser
@@ -65,16 +66,16 @@ class InspectionReport(models.Model):
         null=True,
         blank=False
     )
-
-    image = models.ImageField(null=True)
-
+    # upload_to="upload/", 
+    image = models.ImageField(upload_to="evidences", null=True)
+    
     def __str__(self) -> str:
         return "ÜYV %i" % (self.id)
     
     @property
     def observation_count(self):
         return self.observations.count()
-    
+
 
 class Division(models.Model):
     name = models.CharField(
