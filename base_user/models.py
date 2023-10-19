@@ -20,7 +20,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
             'unique': _('A user with that username already exists.'),
         },
         null=True,
-        blank=True)
+        blank=False)
     first_name = models.CharField(
         _('first name'),
         max_length=30,
@@ -40,7 +40,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
             'unique': _('User with that email already exists.')
         },
         null=True,
-        blank=True
+        blank=False
     )
     position = models.CharField(
         _("employee position"),

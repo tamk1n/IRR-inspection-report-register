@@ -22,8 +22,6 @@ class HomePageView(generic.TemplateView):
 class UserLoginView(LoginView):
     """Logs in user"""
     template_name = "irr_app/login.html"
-    redirect_authenticated_user = False
-    form_class = AuthenticationForm
 
 
 class UserLogoutView(LogoutView):
@@ -64,7 +62,7 @@ class NewIRView(generic.CreateView):
         self.object.engineer.add(self.request.user)
         self.object.observations.add(obs1, obs2)
         return super().form_valid(form)
-    
+
 
 @method_decorator(login_required, name="dispatch")
 class IRRegisterView(generic.ListView):
@@ -152,4 +150,3 @@ class UpdateIRView(generic.UpdateView):
         obs1.save()
         obs2.save()
         return super().form_valid(form)
-    
