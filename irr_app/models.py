@@ -5,7 +5,6 @@ from base_user.models import MyUser
 from manager.models import Company
 from base_user.utils import UserPosition
 
-
 class InspectionReport(models.Model):
     date = models.DateField(blank=False)
     engineer = models.ManyToManyField(
