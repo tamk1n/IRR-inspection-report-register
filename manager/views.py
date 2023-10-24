@@ -7,22 +7,23 @@ from django.urls import reverse_lazy
 
 # Create your views here.
 
+
 class RegisterEmployeeView(View):
-    template_name='manager/add_engineer.html'
+    template_name = 'manager/add_engineer.html'
+    form_class = AddEngineerForm
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        context = {}
-        context['form'] = AddEngineerForm
-        return render(request=request, template_name=self.template_name, context=context, status=HTTPStatus.OK)
+        context: dict = {}
+        context['form'] = self.form_class
+        return render(request, self.template_name, context, status=HTTPStatus.OK)
     
     def post(self, request: HttpRequest, *args, **kwargs):
-        form = AddEngineerForm(self.request.POST)
-        if form.is_valid():
-            redirect_url = reverse_lazy("irr_app:home-page")
-            return HttpResponseRedirect(redirect_url)
-        else:
-            context = {}
-            context['form'] = AddEngineerForm
+        form = self.form_class(self.request.POST)
+        context = {}
 
-        return render(request=request, template_name=self.template_name, context=context, status=HTTPStatus.OK)
+        if not form.is_valid():
+            context['form'] = form
+            return render(request, self.template_name, context=context, status=HTTPStatus.BAD_REQUEST)
+        
+        return render(request, self.template_name, context, status=HTTPStatus.OK)
 
