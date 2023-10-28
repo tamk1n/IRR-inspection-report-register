@@ -60,7 +60,7 @@ MIDDLEWARE = [
 
 CSRF_TRUSTED_ORIGINS = ['https://localhost:8000', 'https://silver-happiness-jj57wxpqq4r5cp44x-8000.app.github.dev']
 ROOT_URLCONF = 'irr.urls'
-
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
