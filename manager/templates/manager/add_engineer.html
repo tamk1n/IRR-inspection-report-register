@@ -2,7 +2,7 @@
 {% block title %}New{% endblock %}
 {% block body %}
     <h1>Mühəndis Əlavə et</h1>
-    <form action="{% url 'manager:register-employee' %}" method="post">
+    <form action="{% url 'manager:add-engineer' %}" method="post">
         {{ form }}
         {% csrf_token %}
     </form>
