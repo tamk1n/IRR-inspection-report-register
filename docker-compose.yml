@@ -27,7 +27,7 @@ services:
             - pgdata:/var/lib/postgresql/data/
     celery:
         build: .
-        command: celery worker --app=core --loglevel=info
+        command: celery --app=irr worker -l INFO
         volumes:
             - .:/usr/src/app
         depends_on:

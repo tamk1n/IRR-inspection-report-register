@@ -1,6 +1,17 @@
+import os
 from celery import shared_task
+from django.core.mail import send_mail
+from django.urls import reverse
 
 
 @shared_task
-def show_user_fullname(user):
-    print(user.full_name)
+def create_token_and_send_email(engineer_email, register_url):
+    print(register_url)
+    send_mail(
+        "Registration Link",
+        register_url,
+        os.getenv('EMAIL_HOST_USER'),
+        ["abt.sinaq@gmail.com"],
+        fail_silently=False,
+        )
+    

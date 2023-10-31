@@ -1,1 +1,9 @@
-<h1>REGISTER</h1>
+{% extends "irr_app/base.html" %}
+{% block title %}New{% endblock %}
+{% block body %}
+    <h1>Qeydiyyatdan keç</h1>
+    <form action="{% url 'manager:register-engineer' %}" method="post">
+        {{ form }}
+        {% csrf_token %}
+    </form>
+{% endblock %} 

@@ -1,12 +1,13 @@
 from django.urls import path
-from manager.views import (RegisterEmployeeView)
+from manager.views import (AddEngineerView, EngineerRegisterView)
 from django.conf import settings
 from django.conf.urls.static import static
 
 app_name = 'manager'
 
 urlpatterns = [
-    path('register-employee',RegisterEmployeeView.as_view(), name='register-employee'),
+    path('register-engineer',AddEngineerView.as_view(), name='add-engineer'),
+    path('register-engineer/<str:token>', EngineerRegisterView.as_view(), name='register-engineer')
 ]
 
 if settings.DEBUG:

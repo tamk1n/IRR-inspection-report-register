@@ -42,5 +42,8 @@ class EngineerRegisterationToken(models.Model):
             # task will be executed after expired_date
             set_token_inactive.apply_async(args=[self.pk], eta=self.expired_date)
 
+    def validate_token(self):
+        raise NameError
+    
     def __str__(self) -> str:
         return "Token %s" % (self.token)
