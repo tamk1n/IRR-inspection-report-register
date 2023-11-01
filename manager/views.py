@@ -12,12 +12,15 @@ from engineer.models import EngineerRegisterationToken
 import os
 from django.urls import reverse
 import uuid
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
+from .permissions import test_func
 # Create your views here.
 
 User = get_user_model()
 
 
-class AddEngineerView(View):
+class AddEngineerView(View, UserPassesTestMixin):
     template_name = 'manager/add_engineer.html'
     form_class = AddEngineerForm
     
@@ -36,6 +39,7 @@ class AddEngineerView(View):
         
         engineer_email = form.cleaned_data['email']
         company = self.request.user.manager_company.first()
+        print(company)
         register_token = EngineerRegisterationToken.objects.create(
             company=company
         )
@@ -43,7 +47,7 @@ class AddEngineerView(View):
         register_url = self.request.build_absolute_uri(
             reverse('manager:register-engineer', args=[register_token.token]))
 
-        self.send_email(register_token, engineer_email, register_url)
+        self.send_email(engineer_email, register_url)
         
         return render(request, self.template_name, context, status=HTTPStatus.OK)
 
@@ -51,28 +55,30 @@ class AddEngineerView(View):
         create_token_and_send_email.delay(engineer_email, register_url)
 
 
-class EngineerRegisterView(generic.CreateView):
+class EngineerRegisterView(LoginRequiredMixin, UserPassesTestMixin, generic.CreateView):
     form_class = EngineerRegisterForm
 
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+    # checks if user position is Manager
+    def test_func(self):
+        return self.request.user.position == 'Manager'
+    
+    def get(self, request, *args, **kwargs):
         raw_token = self.kwargs.get('token', None)
-        self.template_name = 'manager/engineer-register.html' if EngineerRegisterationToken.objects.\
-            filter(token=is_valid_uuid(raw_token), is_expired=True).exists() else 'manager/invalid.html'
+        context = {}
+        context['token'] = raw_token
 
-        if not is_token_valid(raw_token):
-            render(self.request, 'manager/invalid.html', status=HTTPStatus.BAD_REQUEST)
-
-        def is_valid_uuid(token):
-            try:
-                return uuid.UUID(token)
-            except ValueError:
-                return False
-
-        def is_token_valid(token):
-            uuid_token = is_valid_uuid(token)
-            if not uuid_token or not EngineerRegisterationToken.objects.filter(token=uuid_token, is_expired=True).exists():
-                return False
-            #render(self.request, 'manager/invalid.html', status=HTTPStatus.BAD_REQUEST)
-            #return render(self.request, 'manager/engineer-register.html', status=HTTPStatus.OK) 
+        if not self.is_token_valid(raw_token):
+            return render(self.request, 'manager/invalid.html', context, status=HTTPStatus.BAD_REQUEST)
         
-        return render(self.request, 'manager/engineer-register.html', status=HTTPStatus.OK) 
+        return render(self.request, 'manager/engineer-register.html', context, status=HTTPStatus.OK)
+    
+    def is_valid_uuid(self, token):
+        try:
+            return uuid.UUID(token)
+        except ValueError:
+            return False
+
+    def is_token_valid(self, token):
+        uuid_token = self.is_valid_uuid(token)
+        return False if not uuid_token or not EngineerRegisterationToken.objects.filter(
+            token=uuid_token, is_expired=False).exists() else True
