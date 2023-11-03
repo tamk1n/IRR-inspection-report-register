@@ -11,7 +11,7 @@ def create_token_and_send_email(engineer_email, register_url):
         "Registration Link",
         register_url,
         os.getenv('EMAIL_HOST_USER'),
-        ["abt.sinaq@gmail.com"],
+        [engineer_email],
         fail_silently=False,
         )
     

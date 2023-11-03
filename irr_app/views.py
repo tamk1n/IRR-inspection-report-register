@@ -12,6 +12,7 @@ from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect
 from .forms import NewIRForm
 from .models import InspectionReport, Observation
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class HomePageView(generic.TemplateView):
@@ -33,8 +34,7 @@ class UserLogoutView(LogoutView):
     http_method_names = ['post']
 
 
-@method_decorator(login_required, name='dispatch')
-class NewIRView(generic.CreateView):
+class NewIRView(LoginRequiredMixin, generic.CreateView):
     """Creates new IR
     Redirect user to IR Register after successfully create IR"""
     template_name = 'irr_app/newir.html'
@@ -64,8 +64,7 @@ class NewIRView(generic.CreateView):
         return super().form_valid(form)
 
 
-@method_decorator(login_required, name="dispatch")
-class IRRegisterView(generic.ListView):
+class IRRegisterView(LoginRequiredMixin, generic.ListView):
     model = InspectionReport
     template_name = 'irr_app/done.html'
     paginator_class = Paginator
@@ -85,8 +84,7 @@ class IRRegisterView(generic.ListView):
         return context
 
 
-@method_decorator(login_required, name="dispatch")
-class SingleDeleteIR(generic.DeleteView):
+class SingleDeleteIR(LoginRequiredMixin, generic.DeleteView):
     """Single delete of IR.
     View only accepts POST Request
     Any other request handled by Handle405Middleware"""
@@ -112,8 +110,7 @@ class SingleDeleteIR(generic.DeleteView):
         return HttpResponseRedirect(success_url)
 
 
-@method_decorator(login_required, name="dispatch")
-class UpdateIRView(generic.UpdateView):
+class UpdateIRView(LoginRequiredMixin, generic.UpdateView):
     model = InspectionReport
     template_name = 'irr_app/newir.html'
     success_url = reverse_lazy('irr_app:irr')

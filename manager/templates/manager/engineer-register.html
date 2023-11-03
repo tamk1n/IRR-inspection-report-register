@@ -3,7 +3,8 @@
 {% block body %}
     <h1>Qeydiyyatdan keç</h1>
     <form action="{% url 'manager:register-engineer' token=token %}" method="post">
-        {{ form }}
         {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Daxil ol">
     </form>
 {% endblock %} 

@@ -3,7 +3,8 @@
 {% block body %}
     <h1>Mühəndis Əlavə et</h1>
     <form action="{% url 'manager:add-engineer' %}" method="post">
-        {{ form }}
         {% csrf_token %}
+        {{form.as_p}}
+        <input type="submit" value="Əlavə et">
     </form>
 {% endblock %} 

@@ -20,6 +20,9 @@
                   <li class="nav-item">
                     <a class="nav-link" href="{% url 'irr_app:irr' %}">ÜYV Reysteri</a>
                   </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'manager:add-engineer' %}">İşçi artır</a>
+                  </li>
                   {% if not user.is_authenticated %}
                   <li class="nav-item">
                     <a class="nav-link" href="{% url 'irr_app:user-login' %}">Giriş edin</a>

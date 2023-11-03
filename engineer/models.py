@@ -17,6 +17,11 @@ class EngineerRegisterationToken(models.Model):
         editable=False,
         null=True
     )
+    email = models.EmailField(
+        _('User email'),
+        null=True,
+        blank=False
+    )
     expired_date = models.DateTimeField(blank=True, null=True, editable=False)
     is_expired = models.BooleanField(default=False)
     company = models.ForeignKey(

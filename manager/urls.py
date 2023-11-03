@@ -6,7 +6,7 @@ from django.conf.urls.static import static
 app_name = 'manager'
 
 urlpatterns = [
-    path('register-engineer',AddEngineerView.as_view(), name='add-engineer'),
+    path('register-engineer', AddEngineerView.as_view(), name='add-engineer'),
     path('register-engineer/<str:token>', EngineerRegisterView.as_view(), name='register-engineer')
 ]
 

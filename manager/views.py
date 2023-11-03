@@ -1,6 +1,7 @@
 from typing import Any
 from django import http
 from django.db import models
+from django.forms.models import BaseModelForm
 from django.shortcuts import render
 from django.views import View, generic
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
@@ -45,9 +46,9 @@ class AddEngineerView(LoginRequiredMixin, UserPassesTestMixin, View):
         engineer_email = form.cleaned_data['email']
         company = self.request.user.manager_company.first()
         print(company)
-        register_token = EngineerRegisterationToken.objects.create(
-            company=company
-        )
+        register_token = EngineerRegisterationToken.objects.create(email=engineer_email,
+                                                                   company=company
+                                                                   )
 
         register_url = self.request.build_absolute_uri(
             reverse('manager:register-engineer', args=[register_token.token]))
@@ -62,7 +63,8 @@ class AddEngineerView(LoginRequiredMixin, UserPassesTestMixin, View):
 
 class EngineerRegisterView(LoginRequiredMixin, UserPassesTestMixin, generic.CreateView):
     form_class = EngineerRegisterForm
-
+    success_url = reverse_lazy('irr_app:home-page')
+    
     # checks if user position is Manager
     def test_func(self):
         return self.request.user.position == 'Engineer'
@@ -82,7 +84,7 @@ class EngineerRegisterView(LoginRequiredMixin, UserPassesTestMixin, generic.Crea
         initial = super().get_initial()
         token = self.get_object()
         initial = {
-            'email': token.token
+            'email': token.email
         }
         print('in initial')
         return initial
@@ -101,3 +103,4 @@ class EngineerRegisterView(LoginRequiredMixin, UserPassesTestMixin, generic.Crea
         uuid_token = self.is_valid_uuid(token)
         return False if not uuid_token or not EngineerRegisterationToken.objects.filter(
             token=uuid_token, is_expired=False).exists() else True
+    
