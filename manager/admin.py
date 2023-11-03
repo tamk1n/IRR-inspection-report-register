@@ -12,3 +12,4 @@ class CompanyAdmin(ModelAdmin):
     list_filter = ('name',)
     search_fields = ('name',)
     list_per_page = int(os.getenv("COMPANY_PAGE_COUNT"))
+

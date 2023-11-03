@@ -1,8 +1,8 @@
 {% extends "irr_app/base.html" %}
 {% block title %}New{% endblock %}
 {% block body %}
-    <h1>Mühəndis Əlavə et</h1>
-    <form action="{% url 'manager:add-engineer' %}" method="post">
+    <h1>Qeydiyyatdan keç</h1>
+    <form action="{% url 'manager:register-engineer' token=token %}" method="post">
         {{ form }}
         {% csrf_token %}
     </form>

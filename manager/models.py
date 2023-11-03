@@ -2,6 +2,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from base_user.models import MyUser
 from base_user.utils import UserPosition
+import uuid
+import datetime
 
 # Create your models here.
 
@@ -43,18 +45,3 @@ class Company(models.Model):
 
     def __str__(self) -> str:
         return (self.name).strip()
-
-
-"""class Manager(models.Model):
-    manager = models.OneToOneField(
-        MyUser,
-        on_delete=models.CASCADE,
-        #related_name='manager'
-    )
-    company = models.ForeignKey(
-        Company,
-        on_delete=models.CASCADE,
-        related_name='qc',
-        null=True,
-        blank=True
-    )"""

@@ -1,5 +1,8 @@
 from django.contrib import admin
-#from .models import Engineer
-# Register your models here.
+from .models import EngineerRegisterationToken
+from django.contrib.admin import ModelAdmin
 
-#admin.site.register(Engineer)
+
+@admin.register(EngineerRegisterationToken)
+class EngineerRegisterationTokenAdmin(ModelAdmin):
+    pass
