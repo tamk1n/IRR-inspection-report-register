@@ -1,5 +1,6 @@
 from typing import Any
 from django import http
+from django.db import models
 from django.shortcuts import render
 from django.views import View, generic
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
@@ -20,9 +21,13 @@ from .permissions import test_func
 User = get_user_model()
 
 
-class AddEngineerView(View, UserPassesTestMixin):
+class AddEngineerView(LoginRequiredMixin, UserPassesTestMixin, View):
     template_name = 'manager/add_engineer.html'
     form_class = AddEngineerForm
+
+    # checks if user position is Manager
+    def test_func(self):
+        return self.request.user.position == 'Manager'
     
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         context: dict = {}
@@ -60,17 +65,31 @@ class EngineerRegisterView(LoginRequiredMixin, UserPassesTestMixin, generic.Crea
 
     # checks if user position is Manager
     def test_func(self):
-        return self.request.user.position == 'Manager'
+        return self.request.user.position == 'Engineer'
     
     def get(self, request, *args, **kwargs):
         raw_token = self.kwargs.get('token', None)
         context = {}
         context['token'] = raw_token
+        context['form'] = EngineerRegisterForm(initial=self.get_initial())
 
         if not self.is_token_valid(raw_token):
             return render(self.request, 'manager/invalid.html', context, status=HTTPStatus.BAD_REQUEST)
         
         return render(self.request, 'manager/engineer-register.html', context, status=HTTPStatus.OK)
+    
+    def get_initial(self) -> dict[str, Any]:
+        initial = super().get_initial()
+        token = self.get_object()
+        initial = {
+            'email': token.token
+        }
+        print('in initial')
+        return initial
+    
+    def get_object(self):
+        queryset = EngineerRegisterationToken.objects.filter(token=self.kwargs.get('token', None)).first()
+        return queryset
     
     def is_valid_uuid(self, token):
         try:
