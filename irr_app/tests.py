@@ -32,7 +32,7 @@ class LoginViewTestCase(TestCase):
 
         # gives 200 status code because error message appears
         self.assertEqual(response.status_code, HTTPStatus.OK)
-    
+
     def test_correct_data(self):
         """
         It is used to check how login function behaves successfull login.

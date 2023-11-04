@@ -25,6 +25,7 @@ class UserLoginView(LoginView):
     template_name = "irr_app/login.html"
 
 
+
 class UserLogoutView(LogoutView):
     """Logs user out and
     Redirect user to login page
