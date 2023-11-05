@@ -1,9 +1,12 @@
+from collections.abc import Iterable
 from typing import Any
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from base_user.models import MyUser
 from manager.models import Company
 from base_user.utils import UserPosition
+from datetime import datetime
+import pytz
 
 class InspectionReport(models.Model):
     date = models.DateField(blank=False)
@@ -65,12 +68,55 @@ class InspectionReport(models.Model):
         null=True,
         blank=False
     )
-    # upload_to="upload/", 
     image = models.ImageField(upload_to="evidences", null=True)
     
+    status = models.CharField(
+        _('IR status'),
+        choices=[
+            ('Open', _('Open')),
+             ('Close', _('Close')),
+             ('Overdue', _('Overdue'))
+        ],
+        default='Open', null=True, blank=True)
+    
+    target_date = models.DateField(
+        _('IR target date'),
+        null=True,
+        blank=False,
+    )
+
+    close_date = models.DateField(
+        _('Close date'),
+        null=True,
+        blank=True
+    )
+
+    closed = models.BooleanField(
+        _('IR closed'),
+        default=False,
+        null=True
+    )
+
     def __str__(self) -> str:
         return "ÜYV %i" % (self.id)
     
+    
+    class Meta:
+        ordering = ['-id']
+    
+    def save(self):
+        now = datetime.utcnow().replace(tzinfo=pytz.utc)
+        if (self.close_date and self.target_date < self.close_date) or (now > self.target_date):
+            self.status = 'Overdue'
+        elif self.closed:
+            self.status = 'Close'
+        else:
+            self.status = 'Open'
+        super().save()
+
+        set_ir_status.apply_async(args=[self.pk], eta=self.target_date)
+
+
     @property
     def observation_count(self):
         return self.observations.count()
