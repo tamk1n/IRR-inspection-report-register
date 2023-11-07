@@ -2,10 +2,11 @@ from collections.abc import Iterable
 from typing import Any
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
 from base_user.models import MyUser
 from manager.models import Company
 from base_user.utils import UserPosition
-from datetime import datetime
+from datetime import datetime, date
 import pytz
 
 class InspectionReport(models.Model):
@@ -20,14 +21,14 @@ class InspectionReport(models.Model):
         },
         related_name='my_irs',
         null=True,
-        blank=False,
+        blank=True,
     )
 
     project = models.CharField(
         _('Project Name'),
         max_length=1000,
         null=True,
-        blank=False
+        blank=True
     )
 
     division = models.ForeignKey(
@@ -35,7 +36,7 @@ class InspectionReport(models.Model):
         verbose_name=_('Division'),
         related_name='division_irs',
         null=True,
-        blank=False,
+        blank=True,
         on_delete=models.CASCADE
     )
 
@@ -43,21 +44,21 @@ class InspectionReport(models.Model):
         _('Division field'),
         max_length=50,
         null=True,
-        blank=False
+        blank=True
     )
 
     responsible_person = models.CharField(
         _('Responsible Person'),
         max_length=50,
         null=True,
-        blank=False
+        blank=True
     )
 
     observations = models.ManyToManyField(
         'irr_app.Observation',
         related_name='ir',
         null=True,
-        blank=False
+        blank=True
     )
 
     ir_type = models.CharField(
@@ -66,9 +67,9 @@ class InspectionReport(models.Model):
             ('Positive', _('Positive'))
         ],
         null=True,
-        blank=False
+        blank=True
     )
-    image = models.ImageField(upload_to="evidences", null=True)
+    image = models.ImageField(upload_to="evidences", null=True, blank=True)
     
     status = models.CharField(
         _('IR status'),
@@ -91,31 +92,32 @@ class InspectionReport(models.Model):
         blank=True
     )
 
-    closed = models.BooleanField(
-        _('IR closed'),
-        default=False,
-        null=True
-    )
-
     def __str__(self) -> str:
         return "ÜYV %i" % (self.id)
-    
-    
+      
     class Meta:
         ordering = ['-id']
-    
-    def save(self):
-        now = datetime.utcnow().replace(tzinfo=pytz.utc)
-        if (self.close_date and self.target_date < self.close_date) or (now > self.target_date):
-            self.status = 'Overdue'
-        elif self.closed:
+
+    def clean(self):
+        # Don't allow close date of ir in future.
+        if self.close_date and self.close_date > date.today():
+            raise ValidationError(_('You cannot define close date in future.'))
+        
+        # Don't allow close date before issue date.
+        if self.close_date and self.close_date < self.date:
+            raise ValidationError(_('Close date cannot be prior to issue date.'))
+        
+        return super().clean()
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        created = True if self.pk else False
+        if self.close_date and self.status != 'Overdue':
             self.status = 'Close'
-        else:
-            self.status = 'Open'
-        super().save()
 
-        set_ir_status.apply_async(args=[self.pk], eta=self.target_date)
+        super().save(force_insert, force_update, using, update_fields)
 
+        if not created: #and not self.close_date:
+            from .tasks import set_ir_status
+            set_ir_status.apply_async(args=[self.pk], eta=self.target_date)
 
     @property
     def observation_count(self):
