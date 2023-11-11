@@ -76,7 +76,7 @@ class IRRegisterView(LoginRequiredMixin, generic.ListView):
         user = self.request.user
         company = user.employee_company.first()
         divisions = company.company_dvs.all()
-        queryset = InspectionReport.objects.filter(division__in=divisions).all()
+        queryset = InspectionReport.objects.select_related('division__company').filter(division__in=divisions).all()
         return queryset
     
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
@@ -119,8 +119,8 @@ class UpdateIRView(LoginRequiredMixin, generic.UpdateView):
 
     def get(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         """If user is not the creator of IR it redirects user to success_url"""
-        ir = self.get_object()
-        if ir in self.request.user.my_irs.all():
+        self.object = self.get_object()
+        if self.object in self.request.user.my_irs.all():
             return super().get(request, *args, **kwargs)
         return HttpResponseRedirect(self.success_url)
 
@@ -131,18 +131,19 @@ class UpdateIRView(LoginRequiredMixin, generic.UpdateView):
     
     def get_initial(self) -> dict[str, Any]:
         initial = super().get_initial()
-        ir = self.get_object()
+        ir = self.object
         initial = {'observation1': ir.observations.all()[0].content,
                    'observation2': ir.observations.all()[1].content}
         return initial
     
     def form_valid(self, form):
         """If the form is valid, save the associated model."""
+        ir = self.object
+
         self.object = form.save()
 
         # create new observations since 
         # Observation and InspectionReport are many-to-many related
-        ir = self.get_object()
         obs1, obs2 = ir.observations.all()[0], ir.observations.all()[1]
         obs1.content, obs2.content = form.cleaned_data['observation1'], form.cleaned_data['observation2']
         obs1.save()

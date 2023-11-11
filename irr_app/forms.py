@@ -15,7 +15,7 @@ class NewIRForm(forms.ModelForm):
         if user:
             self.fields['division'].queryset = user.employee_company.\
                 first().company_dvs.all()
-
+            
     observation1 = forms.CharField(
         widget=forms.Textarea(attrs={"cols": 30, "rows": 5}))
     observation2 = forms.CharField(
@@ -25,10 +25,12 @@ class NewIRForm(forms.ModelForm):
         model = InspectionReport
         fields = ('date', 'project',
                   'division', 'field', 'responsible_person',
-                  'ir_type', 'image')
+                  'ir_type', 'image', 'close_date', 'target_date')
     
         widgets = {
             'date': forms.SelectDateWidget(),
+            'close_date': forms.SelectDateWidget(),
+            'target_date': forms.SelectDateWidget(),
         }
 
         

@@ -21,14 +21,14 @@ class InspectionReport(models.Model):
         },
         related_name='my_irs',
         null=True,
-        blank=True,
+        blank=False,
     )
 
     project = models.CharField(
         _('Project Name'),
         max_length=1000,
         null=True,
-        blank=True
+        blank=False
     )
 
     division = models.ForeignKey(
@@ -36,7 +36,7 @@ class InspectionReport(models.Model):
         verbose_name=_('Division'),
         related_name='division_irs',
         null=True,
-        blank=True,
+        blank=False,
         on_delete=models.CASCADE
     )
 
@@ -44,21 +44,21 @@ class InspectionReport(models.Model):
         _('Division field'),
         max_length=50,
         null=True,
-        blank=True
+        blank=False
     )
 
     responsible_person = models.CharField(
         _('Responsible Person'),
         max_length=50,
         null=True,
-        blank=True
+        blank=False
     )
 
     observations = models.ManyToManyField(
         'irr_app.Observation',
         related_name='ir',
         null=True,
-        blank=True
+        blank=False
     )
 
     ir_type = models.CharField(
@@ -67,7 +67,7 @@ class InspectionReport(models.Model):
             ('Positive', _('Positive'))
         ],
         null=True,
-        blank=True
+        blank=False
     )
     image = models.ImageField(upload_to="evidences", null=True, blank=True)
     
@@ -108,6 +108,7 @@ class InspectionReport(models.Model):
             raise ValidationError(_('Close date cannot be prior to issue date.'))
         
         return super().clean()
+    
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         created = True if self.pk else False
         if self.close_date and self.status != 'Overdue':
@@ -115,7 +116,7 @@ class InspectionReport(models.Model):
 
         super().save(force_insert, force_update, using, update_fields)
 
-        if not created: #and not self.close_date:
+        if not created:
             from .tasks import set_ir_status
             set_ir_status.apply_async(args=[self.pk], eta=self.target_date)
 

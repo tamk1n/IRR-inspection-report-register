@@ -4,7 +4,7 @@
 <table class="table table-hover">
     <thead>
       <tr>
-        <th scope="col">Yoxlama Tarixi</th>
+        <th scope="col">Yoxlama tarixi</th>
         <th scope="col">№</th>
         <th scope="col">Aşkarlayan</th>
         <th scope="col">Obyekt</th>
@@ -13,6 +13,9 @@
         <th scope="col">Cavabdeh Şəxs</th>
         <th scope="col">Müşahidələr</th>
         <th scope="col">Müşahidə növü</th>
+        <th scope="col">Status</th>
+        <th scope="col">Bağlanma tarixi</th>
+        <th scope="col">Hədəf tarixi</th>
         <th scope="col"></th>
         <th scope="col"></th>
       </tr>
@@ -39,6 +42,9 @@
           </ol>
         </td>
         <td>{{ir.ir_type}}</td>
+        <td>{{ir.status}}</td>
+        <td>{{ir.close_date|date:"d.m.Y"|lower}}</td>
+        <td>{{ir.target_date|date:"d.m.Y"|lower}}</td>
         {% if ir.engineer.first == user %}
         <td>
           <form action="{% url 'irr_app:update-ir' ir.id %}" method="get">
