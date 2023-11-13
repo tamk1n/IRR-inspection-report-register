@@ -1,6 +1,7 @@
 from collections.abc import Iterable
 from typing import Any
 from django.db import models
+from django.db.models.query import QuerySet
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from base_user.models import MyUser
@@ -9,6 +10,14 @@ from base_user.utils import UserPosition
 from datetime import datetime, date
 import pytz
 
+class IRStatusQueryset(models.QuerySet):
+    def negative(self):
+        return self.filter(ir_type='Negative')
+
+class IRStatusManager(models.Manager):
+    def get_queryset(self) -> QuerySet:
+        return IRStatusQueryset(self.model)
+    
 class InspectionReport(models.Model):
     date = models.DateField(blank=False)
     engineer = models.ManyToManyField(
@@ -91,6 +100,8 @@ class InspectionReport(models.Model):
         null=True,
         blank=True
     )
+    objects = models.Manager()
+    ir_status = IRStatusManager()
 
     def __str__(self) -> str:
         return "ÜYV %i" % (self.id)
