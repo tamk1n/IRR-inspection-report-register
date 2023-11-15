@@ -60,7 +60,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'username'
     objects = UserManager()
 
-    class Meta():
+    class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
 

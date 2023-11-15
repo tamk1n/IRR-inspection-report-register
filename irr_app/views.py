@@ -132,8 +132,8 @@ class UpdateIRView(LoginRequiredMixin, generic.UpdateView):
     def get_initial(self) -> dict[str, Any]:
         initial = super().get_initial()
         ir = self.object
-        initial = {'observation1': ir.observations.all()[0].content,
-                   'observation2': ir.observations.all()[1].content}
+        initial = {'observation1': ir.observations.values_list('content', flat=True)[0],
+                   'observation2': ir.observations.values_list('content', flat=True)[1]}
         return initial
     
     def form_valid(self, form):
