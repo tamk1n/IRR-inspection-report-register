@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from base_user.models import MyUser
 from manager.models import Company
 from base_user.utils import UserPosition
+from irr_app.utils import (IRType, IRStatus)
 from datetime import datetime, date
 import pytz
 
@@ -70,24 +71,23 @@ class InspectionReport(models.Model):
         blank=False
     )
 
+    IR_TYPE_CHOICES = [(ir_type.name, ir_type.value) for ir_type in IRType]
+
     ir_type = models.CharField(
-        choices=[
-            ('Negative', _('Negative')),
-            ('Positive', _('Positive'))
-        ],
+        choices=IR_TYPE_CHOICES,
         null=True,
         blank=False
     )
+
     image = models.ImageField(upload_to="evidences", null=True, blank=True)
     
+    IR_STATUS_CHOICES = [(ir_status.name, ir_status.value) for ir_status in IRStatus]
     status = models.CharField(
         _('IR status'),
-        choices=[
-            ('Open', _('Open')),
-             ('Close', _('Close')),
-             ('Overdue', _('Overdue'))
-        ],
-        default='Open', null=True, blank=True)
+        choices=IR_STATUS_CHOICES,
+        default=IR_STATUS_CHOICES[0],
+        null=True,
+        blank=True)
     
     target_date = models.DateField(
         _('IR target date'),
