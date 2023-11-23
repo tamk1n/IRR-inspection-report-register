@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from typing import Any
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
@@ -70,18 +71,25 @@ class IRRegisterView(LoginRequiredMixin, generic.ListView):
     template_name = 'irr_app/done.html'
     paginator_class = Paginator
     paginate_by = 15
+    #ordering = ['-id']
+    def get_ordering(self) -> Sequence[str]:
+        ordering = self.request.GET.get('order', '-pk')
+        return ordering
     
     def get_queryset(self) -> QuerySet[Any]:
         """queryset for specific division which is part of user's company"""
         user = self.request.user
         company = user.employee_company.first()
         divisions = company.company_dvs.all()
-        queryset = InspectionReport.objects.select_related('division__company').filter(division__in=divisions).all()
+        queryset = InspectionReport.objects.select_related('division__company').filter(division__in=divisions).order_by(self.get_ordering()).all()
         return queryset
     
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        print(self.request.GET.get('order'))
         context = super().get_context_data(**kwargs)
         context['user'] = self.request.user
+        context['ordering'] = self.get_ordering()
+        print(context)
         return context
 
 

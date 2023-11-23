@@ -2,84 +2,85 @@
 {% block title %}Yoxlama reysteri{% endblock %}
 {% block body %}
 <table class="table table-hover">
-    <thead>
-      <tr>
-        <th scope="col">Yoxlama tarixi</th>
-        <th scope="col">№</th>
-        <th scope="col">Aşkarlayan</th>
-        <th scope="col">Obyekt</th>
-        <th scope="col">Bölüm</th>
-        <th scope="col">Sahə</th>
-        <th scope="col">Cavabdeh Şəxs</th>
-        <th scope="col">Müşahidələr</th>
-        <th scope="col">Müşahidə növü</th>
-        <th scope="col">Status</th>
-        <th scope="col">Bağlanma tarixi</th>
-        <th scope="col">Hədəf tarixi</th>
-        <th scope="col"></th>
-        <th scope="col"></th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for ir in object_list %}
-      <tr class="table-dark">
-        <th scope="row">{{ir.date|date:"d.m.Y"|lower}}</th>
-        <td>{{ir.id}}</td>
-        <td>
-          {% for engineer in ir.engineer.all %}
-            {{ engineer.full_name }}
-          {% endfor %}
-        </td>        
-        <td>{{ir.project}}</td>
-        <td>{{ir.division}}</td>
-        <td>{{ir.field}}</td>
-        <td>{{ir.responsible_person}}</td>
-        <td>
-          <ol>
+  <thead>
+    <tr>
+      <th scope="col">Yoxlama tarixi</th>
+      <th scope="col">№</th>
+      <th>vb</th>
+      <th scope="col">Aşkarlayan</th>
+      <th scope="col">Obyekt</th>
+      <th scope="col">Bölüm</th>
+      <th scope="col">Sahə</th>
+      <th scope="col">Cavabdeh Şəxs</th>
+      <th scope="col">Müşahidələr</th>
+      <th scope="col">Müşahidə növü</th>
+      <th scope="col">Status</th>
+      <th scope="col">Bağlanma tarixi</th>
+      <th scope="col">Hədəf tarixi</th>
+      <th scope="col"></th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for ir in object_list %}
+    <tr class="table-dark">
+      <th scope="row">{{ir.date|date:"d.m.Y"|lower}}</th>
+      <td>{{ir.id}}</td>
+      <td>
+        {% for engineer in ir.engineer.all %}
+        {{ engineer.full_name }}
+        {% endfor %}
+      </td>
+      <td>{{ir.project}}</td>
+      <td>{{ir.division}}</td>
+      <td>{{ir.field}}</td>
+      <td>{{ir.responsible_person}}</td>
+      <td>
+        <ol>
           {% for observation in ir.observations.all %}
-              <li>{{ observation.content }}</li>
+          <li>{{ observation.content }}</li>
           {% endfor %}
-          </ol>
-        </td>
-        <td>{{ir.ir_type}}</td>
-        <td>{{ir.status}}</td>
-        <td>{{ir.close_date|date:"d.m.Y"|lower}}</td>
-        <td>{{ir.target_date|date:"d.m.Y"|lower}}</td>
-        {% if ir.engineer.first == user %}
-        <td>
-          <form action="{% url 'irr_app:update-ir' ir.id %}" method="get">
-            <input type="submit" value="Redaktə">
-          </form>
-        </td>
-        <td>
-          <form action="{% url 'irr_app:single-delete-ir' ir.id %}" method="post">
-            {% csrf_token %}
-            <input type="submit" value="Sil">
-          </form>
-        </td>
-        {% else %}
-          <td></td>
-          <td></td>
-        {% endif %}
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <div class="pagination">
-    <span class="step-links">
-        {% if page_obj.has_previous %}
-            <a href="?page=1">&laquo; first</a>
-            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
-        {% endif %}
+        </ol>
+      </td>
+      <td>{{ir.ir_type}}</td>
+      <td>{{ir.status}}</td>
+      <td>{{ir.close_date|date:"d.m.Y"|lower}}</td>
+      <td>{{ir.target_date|date:"d.m.Y"|lower}}</td>
+      {% if ir.engineer.first == user %}
+      <td>
+        <form action="{% url 'irr_app:update-ir' ir.id %}" method="get">
+          <input type="submit" value="Redaktə">
+        </form>
+      </td>
+      <td>
+        <form action="{% url 'irr_app:single-delete-ir' ir.id %}" method="post">
+          {% csrf_token %}
+          <input type="submit" value="Sil">
+        </form>
+      </td>
+      {% else %}
+      <td></td>
+      <td></td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<div class="pagination">
+  <span class="step-links">
+    {% if page_obj.has_previous %}
+    <a href="?page=1">&laquo; first</a>
+    <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+    {% endif %}
 
-        <span class="current">
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-        </span>
-
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-        {% endif %}
+    <span class="current">
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
     </span>
+
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">next</a>
+    <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+    {% endif %}
+  </span>
 </div>
 {% endblock %}
